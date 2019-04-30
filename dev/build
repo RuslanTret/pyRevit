@@ -1,9 +1,13 @@
 #!/bin/bash
 
-OPTIND=1    # Reset in case getopts has been used previously in the shell.
+# Reset in case getopts has been used previously in the shell.
+OPTIND=1
+
+# save env
 THISPATH=$(dirname "$0")
 
 # initialize build options
+CLEAN=false
 OPENDOCS=false
 BUILDDOCS=false
 BUILDLABS=false
@@ -13,31 +17,52 @@ REBUILD=false
 # ==============================================================================
 # Configs
 # ------------------------------------------------------------------------------
-LABS=$THISPATH/pyRevitLabs/pyRevitLabs.sln
-UTILSPATH=$THISPATH/utils
-BINPATH=$THISPATH/../bin
 DEVENV='devenv.exe'
-AUTOCOMP=$UTILSPATH/pyrevit-autocomplete.exe
-FINFO=$UTILSPATH/pyrevit-fileinfo.exe
+LOGFILE="./build.log"
+
+BINPATH=$THISPATH/../bin
+UTILSPATH=$THISPATH/utils
+
+DOCSPATH=$THISPATH/../docs
+DOCSBUILDPATH=$THISPATH/../docs/_build
+DOCSINDEXPATH=$DOCSBUILDPATH/index.html
+
+LABS=$THISPATH/pyRevitLabs/pyRevitLabs.sln
+
+AUTOCOMP=$UTILSPATH/pyrevit-autocomplete.go
+AUTOCOMPBIN=$BINPATH/pyrevit-autocomplete.exe
+
+FINFO=$UTILSPATH/pyrevit-fileinfo.go
+FINFOBIN=$BINPATH/pyrevit-fileinfo.exe
+
+TOASTURL='https://go-toast-downloads.s3.amazonaws.com/v1/toast64.exe'
+TOASTBIN=$BINPATH/toast64.exe
 # ==============================================================================
 
-function print_help {
+function print_help() {
     cat << EOF
 Usage: build OPTIONS
 
-| Dependencies:                                                                |
+| Build Tools:                                                                 |
 |                                                                              |
-|     Install these tools before starting build process                        |
-|         cmder               https://cmder.net/                               |
-|         choco               https://chocolatey.org/install                   |
-|         Visual Studio (C#)  https://visualstudio.microsoft.com/vs/           |
+|     Install these tools before starting the build process                    |
+|         cmder (full)          https://cmder.net/                             |
+|         choco (pkg manager)   https://chocolatey.org/install                 |
+|         Visual Studio (C#)    https://visualstudio.microsoft.com/vs/         |
+|         python 2.7 (docs)     https://www.python.org/downloads/              |
+|         pipenv (venv)         https://pipenv.readthedocs.io/en/latest/       |
 |                                                                              |
 |     Add the "Microsoft Visual Studio\2017\Community\Common7\IDE" path        |
-|     to system %PATH% env variable. Test devenv.exe works from shell.         |
+|     to system %PATH% env variable. Test 'devenv.exe' works from shell.       |
 |                                                                              |
-|     After successfully installing dependencies, open cmder and run command   |
-|     below. This will install all necessary build-time dependencies.          |
+|     After successfully installing build tools, open bash and run command     |
+|     below. This will install other tools (listed below) using choco,         |
+|     and will prepare the python venv for building docs.                      |
 |         $ build -i                                                           |
+|                                                                              |
+|     Build time dependencies:                                                 |
+|         golang                for building helper utilities                  |
+|         upx                   for compressing exe binaries                   |
 
 OPTIONS:
     -h                  print this help
@@ -45,13 +70,26 @@ OPTIONS:
     -l                  build pyrevit labs modules and cli tool using
                          Visual Studio C# compiler
     -g                  build for debug
-    -c                  clean build files
+    -c                  clean build files and exit; use with -d or -l
     -r                  re-build
     -p                  open docs page after build
+
+Examples:
+    build -dp           build and open docs
+    build -rdp          re-build and open docs
+    build -rl           re-build labs
 
 Notes:
     1. bash build script is used to allow building docs and other
        non-win-dependent components on other operating systems as well.
+
+    2. helper utilities are written in go to benefit from load time speed.
+       e.g. pyrevit-autocomplete.exe is designed to be used by shell to
+       provide autocomplete for pyrevit cli. it is important that it runs fast
+       so autocomplete is easy to use.
+    
+    3. exe binaries are compressed after build to reduce the file size since
+       these binaries are stored in the git repo for ease of deployment.
 
 Report bugs to: https://github.com/eirannejad/pyRevit/issues
 
@@ -59,7 +97,7 @@ EOF
 exit 1
 }
 
-function check_docs_buildenv {
+function check_docs_buildenv() {
     echo "verifying build dependencies for docs..."
     if ! [ -x "$(command -v pipenv)" ]; then
         echo -e '\033[31mError: pipenv is not installed.\033[39m\n' >& 2
@@ -68,7 +106,7 @@ function check_docs_buildenv {
     fi
 }
 
-function check_labs_buildenv {
+function check_labs_buildenv() {
     echo "verifying build dependencies for labs..."
     if ! [ -x "$(command -v upx)" ]; then
         echo -e '\033[31mError: upx is not installed.\033[39m\n' >& 2
@@ -85,39 +123,53 @@ function check_labs_buildenv {
     fi
 }
 
-function clean_docs {
+function clean_docs() {
     # function to clean all generated docs
     echo "cleaning docs..."
     rm -rf $THISPATH/../docs/_build
 }
 
-function clean_labs {
+function clean_labs() {
     # function to clean labs build files
     echo "cleaning labs..."
     rm -f ../bin/pyrevit*
     rm -f ../bin/*.dll
-    "$DEVENV" "$LABS" "//Clean" "Debug" "//out" "./buildlog.log"
+    "$DEVENV" "$LABS" "//Clean" "Debug" "//out" $LOGFILE
 }
 
-function clean_opt {
-    clean_docs
-    clean_labs
+function open() {
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # Mac OSX
+        open $1
+    elif [[ "$OSTYPE" == "cygwin" ]]; then
+        # POSIX compatibility layer and Linux environment
+        # emulation for Windows
+        start $1
+    elif [[ "$OSTYPE" == "msys" ]]; then
+        # Lightweight shell and GNU utilities compiled for
+        # Windows (part of MinGW)
+        start $1
+    elif [[ "$OSTYPE" == "win32" ]]; then
+        # I'm not sure this can happen.
+        start $1
+    fi
 }
 
-function install_opt {
+function install_opt() {
     echo "installing build-time dependencies..."
     echo "installing upx..."
     choco install upx -y &>/dev/null
     echo "installing go..."
     choco install golang -y &>/dev/null
-    echo "installing python 2.7..."
-    choco install python2 -y &>/dev/null
-    echo "installing pipenv..."
-    pip2 install pipenv
+    # echo "installing python 2.7 ..."
+    # choco install python2 -y &>/dev/null
+    # echo "installing pipenv..."
+    # pip2 install pipenv
+    echo "setting up pipenv venv..."
     pipenv install
 }
 
-function process_args {
+function process_args() {
     while getopts "hidlrpc" opt; do
         case "$opt" in
         h|\?) print_help
@@ -134,7 +186,7 @@ function process_args {
             ;;
         r)  REBUILD=true
             ;;
-        c)  clean_opt
+        c)  CLEAN=true
             ;;
         esac
     done
@@ -142,13 +194,22 @@ function process_args {
     shift $((OPTIND-1))
 }
 
+function cleanup_and_exit() {
+    # cleanups
+    rm -f $LOGFILE
+    exit
+}
+
 # ==============================================================================
 # main()
 # ==============================================================================
+
 # process command line arguments and set global vars
+# ------------------------------------------------------------------------------
 process_args $*
 
 # build docs?
+# ------------------------------------------------------------------------------
 if $BUILDDOCS; then
     # verify env
     check_docs_buildenv
@@ -156,12 +217,13 @@ if $BUILDDOCS; then
     # re-build?
     if $REBUILD; then
         clean_docs
+    # just clean?
+    elif $CLEAN; then
+        clean_docs
+        cleanup_and_exit
     fi
 
     # build docs
-    DOCSPATH=$THISPATH/../docs
-    DOCSBUILDPATH=$THISPATH/../docs/_build
-    DOCSINDEXPATH=$DOCSBUILDPATH/index.html
     echo "building docs..."
     echo "build path: "$DOCSPATH
     pipenv run sphinx-build -b html $DOCSPATH $DOCSBUILDPATH
@@ -169,22 +231,11 @@ if $BUILDDOCS; then
     # open docs after build?
     if $OPENDOCS; then
         echo "opening docs..."
-        if [[ "$OSTYPE" == "darwin"* ]]; then
-            # Mac OSX
-            open $DOCSINDEXPATH
-        elif [[ "$OSTYPE" == "cygwin" ]]; then
-            # POSIX compatibility layer and Linux environment emulation for Windows
-            start $DOCSINDEXPATH
-        elif [[ "$OSTYPE" == "msys" ]]; then
-            # Lightweight shell and GNU utilities compiled for Windows (part of MinGW)
-            start $DOCSINDEXPATH
-        elif [[ "$OSTYPE" == "win32" ]]; then
-            # I'm not sure this can happen.
-            start $DOCSINDEXPATH
-        fi
+        open $DOCSINDEXPATH
     fi
 
 # build labs?
+# ------------------------------------------------------------------------------
 elif $BUILDLABS; then
     # verify env
     check_labs_buildenv
@@ -192,7 +243,12 @@ elif $BUILDLABS; then
     # re-build?
     BUILDTYPE="//Build"
     if $REBUILD; then
+        clean_labs
         BUILDTYPE="//Rebuild"
+    # just clean?
+    elif $CLEAN; then
+        clean_labs
+        cleanup_and_exit
     fi
 
     # build for debug or release?
@@ -202,36 +258,37 @@ elif $BUILDLABS; then
     fi
 
     # start a log file and listen
-    cat /dev/null > ./buildlog.log
-    tail -f ./buildlog.log &
+    cat /dev/null > $LOGFILE
+    tail -f $LOGFILE &
         
     # build labs
     echo "building labs for "$BUILDCONFIG
-    "$DEVENV" "$LABS" "$BUILDTYPE" "$BUILDCONFIG" "//out" "./buildlog.log"
-
+    "$DEVENV" "$LABS" "$BUILDTYPE" "$BUILDCONFIG" "//out" $LOGFILE
 
     # clean log file
     kill $!
-    rm -f ./buildlog.log
 
     # build and pack utilities
     # build pyrevit cli auto complete helper
     echo "building autocomplete helper binary"
-    rm -f $BINPATH/pyrevit-autocomplete.exe
+    rm -f $AUTOCOMPBIN
     go get github.com/posener/complete/gocomplete
-    go build -o=$BINPATH/pyrevit-autocomplete.exe $UTILSPATH/pyrevit-autocomplete.go
-    upx --mono $BINPATH/pyrevit-autocomplete.exe
+    go build -o=$AUTOCOMPBIN $AUTOCOMP
+    upx --mono $AUTOCOMPBIN
 
     # build pyrevit fileinfo getter
     echo "building fileinfo helper binary"
-    rm -f $BINPATH/pyrevit-fileinfo.exe
-    go build -o=$BINPATH/pyrevit-fileinfo.exe $UTILSPATH/pyrevit-fileinfo.go
-    upx --mono $BINPATH/pyrevit-fileinfo.exe
+    rm -f $FINFOBIN
+    go build -o=$FINFOBIN $FINFO
+    upx --mono $FINFOBIN
 
     # pack utilities
     echo "packing other cli utilities"
-    upx --mono $BINPATH/toast64.exe
+    echo "downloading toast64 helper binary..."
+    curl -o $TOASTBIN $TOASTURL
+    upx --mono $TOASTBIN
 fi
 
 # done
 echo "build completed..."
+cleanup_and_exit
