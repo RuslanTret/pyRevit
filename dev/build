@@ -32,9 +32,6 @@ LABS=$THISPATH/pyRevitLabs/pyRevitLabs.sln
 AUTOCOMP=$UTILSPATH/pyrevit-autocomplete.go
 AUTOCOMPBIN=$BINPATH/pyrevit-autocomplete.exe
 
-FINFO=$UTILSPATH/pyrevit-fileinfo.go
-FINFOBIN=$BINPATH/pyrevit-fileinfo.exe
-
 TOASTURL='https://go-toast-downloads.s3.amazonaws.com/v1/toast64.exe'
 TOASTBIN=$BINPATH/toast64.exe
 # ==============================================================================
@@ -132,7 +129,7 @@ function clean_docs() {
 function clean_labs() {
     # function to clean labs build files
     echo "cleaning labs..."
-    rm -f ../bin/pyrevit*
+    rm -f ../bin/*.exe
     rm -f ../bin/*.dll
     "$DEVENV" "$LABS" "//Clean" "Debug" "//out" $LOGFILE
 }
@@ -275,12 +272,6 @@ elif $BUILDLABS; then
     go get github.com/posener/complete/gocomplete
     go build -o=$AUTOCOMPBIN $AUTOCOMP
     upx --mono $AUTOCOMPBIN
-
-    # build pyrevit fileinfo getter
-    echo "building fileinfo helper binary"
-    rm -f $FINFOBIN
-    go build -o=$FINFOBIN $FINFO
-    upx --mono $FINFOBIN
 
     # pack utilities
     echo "packing other cli utilities"
