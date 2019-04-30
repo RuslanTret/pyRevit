@@ -212,7 +212,6 @@ elif $BUILDLABS; then
 
     # clean log file
     kill $!
-    rm -f ./buildlog.log
 
     # build and pack utilities
     # build pyrevit cli auto complete helper
@@ -232,6 +231,9 @@ elif $BUILDLABS; then
     echo "packing other cli utilities"
     upx --mono $BINPATH/toast64.exe
 fi
+
+# cleanups
+rm -f ./buildlog.log
 
 # done
 echo "build completed..."
