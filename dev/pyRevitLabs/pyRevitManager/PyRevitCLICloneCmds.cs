@@ -14,8 +14,8 @@ using pyRevitLabs.TargetApps.Revit;
 using pyRevitLabs.Language.Properties;
 
 using NLog;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using pyRevitLabs.Json;
+using pyRevitLabs.Json.Serialization;
 
 using Console = Colorful.Console;
 

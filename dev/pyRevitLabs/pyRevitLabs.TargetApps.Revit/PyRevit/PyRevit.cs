@@ -10,7 +10,7 @@ using pyRevitLabs.Common;
 using pyRevitLabs.Common.Extensions;
 
 using MadMilkman.Ini;
-using Newtonsoft.Json.Linq;
+using pyRevitLabs.Json.Linq;
 using NLog;
 
 namespace pyRevitLabs.TargetApps.Revit {

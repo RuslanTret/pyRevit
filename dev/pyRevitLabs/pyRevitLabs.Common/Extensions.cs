@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Globalization;
 
 using NLog;
-using Newtonsoft.Json;
+using pyRevitLabs.Json;
 
 namespace pyRevitLabs.Common.Extensions {
     public static class CharExtensions {

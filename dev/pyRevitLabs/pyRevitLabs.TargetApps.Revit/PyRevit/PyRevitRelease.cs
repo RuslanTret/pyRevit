@@ -11,8 +11,8 @@ using pyRevitLabs.Common;
 using pyRevitLabs.Common.Extensions;
 
 using NLog;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using pyRevitLabs.Json;
+using pyRevitLabs.Json.Linq;
 
 namespace pyRevitLabs.TargetApps.Revit {
     public enum PyRevitReleaseAssetType {

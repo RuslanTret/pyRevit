@@ -14,8 +14,8 @@ using pyRevitLabs.TargetApps.Revit;
 using pyRevitLabs.Language.Properties;
 
 using NLog;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using pyRevitLabs.Json;
+using pyRevitLabs.Json.Serialization;
 
 using Console = Colorful.Console;
 
@@ -137,7 +137,7 @@ namespace pyRevitManager {
                     };
 
             var jsonExportCfg = new JsonSerializerSettings {
-                Error = delegate (object sender, Newtonsoft.Json.Serialization.ErrorEventArgs args) {
+                Error = delegate (object sender, pyRevitLabs.Json.Serialization.ErrorEventArgs args) {
                     args.ErrorContext.Handled = true;
                 },
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
