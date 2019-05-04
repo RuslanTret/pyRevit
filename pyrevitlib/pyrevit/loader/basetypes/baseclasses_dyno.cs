@@ -64,6 +64,8 @@ namespace PyRevitBaseClasses {
 
                 // The journal file can specify if the existing UIless RevitDynamoModel
                 // needs to be shutdown before performing any action.
+                // per comments on https://github.com/eirannejad/pyRevit/issues/570
+                // Setting this to True slows down Dynamo by a factor of 3
                 { "dynModelShutDown",  "True" },
 
                 // The journal file can specify the values of Dynamo nodes.
