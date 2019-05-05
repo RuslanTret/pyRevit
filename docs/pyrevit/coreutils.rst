@@ -1,5 +1,5 @@
-:mod:`pyrevit.coreutils`
-========================
+pyrevit.coreutils
+=================
 
 
 Misc Helper functions for pyRevit.
