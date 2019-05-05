@@ -53,13 +53,14 @@ deeper into pyRevit inner workings.
 * :doc:`pyrevit/init`
 * :doc:`pyrevit/api`
 * :doc:`pyrevit/compat`
+* :doc:`pyrevit/coreutils`
 * :doc:`pyrevit/forms`
 * :doc:`pyrevit/framework`
-* :doc:`pyrevit/script`
-* :doc:`pyrevit/userconfig`
-* :doc:`pyrevit/coreutils`
 * :doc:`pyrevit/output`
 * :doc:`pyrevit/revit`
+* :doc:`pyrevit/script`
+* :doc:`pyrevit/userconfig`
+* :doc:`pyrevit/versionmgr`
 
 ..  toctree::
     :maxdepth: 2
@@ -69,10 +70,11 @@ deeper into pyRevit inner workings.
     pyrevit/init.rst
     pyrevit/api.rst
     pyrevit/compat.rst
+    pyrevit/coreutils.rst
     pyrevit/forms.rst
     pyrevit/framework.rst
-    pyrevit/script.rst
-    pyrevit/userconfig.rst
-    pyrevit/coreutils.rst
     pyrevit/output.rst
     pyrevit/revit.rst
+    pyrevit/script.rst
+    pyrevit/userconfig.rst
+    pyrevit/versionmgr.rst
