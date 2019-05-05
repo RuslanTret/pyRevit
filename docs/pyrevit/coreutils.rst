@@ -9,6 +9,7 @@ Misc Helper functions for pyRevit.
 
    coreutils/init.rst
    coreutils/appdata.rst
+   coreutils/charts.rst
    coreutils/colors.rst
    coreutils/configparser.rst
    coreutils/dotnetcompiler.rst
