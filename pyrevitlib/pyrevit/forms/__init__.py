@@ -154,6 +154,7 @@ class WPFWindow(framework.Windows.Window):
 
     @property
     def pyrevit_version(self):
+        """Active pyRevit formatted version e.g. '4.9-beta'"""
         return 'pyRevit {}'.format(
             versionmgr.get_pyrevit_version().get_formatted()
             )
@@ -211,7 +212,7 @@ class WPFWindow(framework.Windows.Window):
         for wpfel in wpf_elements:
             wpfel.IsEnabled = True
 
-    def handle_url_click(self, sender, args):
+    def handle_url_click(self, sender, args): #pylint: disable=unused-argument
         """Callback for handling click on package website url"""
         return webbrowser.open_new_tab(sender.NavigateUri.AbsoluteUri)
 
@@ -817,7 +818,8 @@ class GetValueWindow(TemplateUserInputWindow):
             self.datePrompt.Text = \
                 value_prompt if value_prompt else 'Pick date:'
 
-    def string_value_changed(self, sender, args):
+    def string_value_changed(self, sender, args): #pylint: disable=unused-argument
+        """Handle string vlaue update event."""
         filtered_rvalues = \
             sorted([x for x in self.reserved_values
                     if self.stringValue_tb.Text in str(x)],
@@ -833,6 +835,7 @@ class GetValueWindow(TemplateUserInputWindow):
             self.okayButton.IsEnabled = True
 
     def select(self, sender, args):    #pylint: disable=W0613
+        """Process input data and set the response."""
         self.Close()
         if self.value_type == 'string':
             self.response = self.stringValue_tb.Text
@@ -2151,6 +2154,27 @@ def toast(message, title='pyRevit', appid='pyRevit',
 
 
 def ask_for_string(default=None, prompt=None, title=None, **kwargs):
+    """Ask user to select a string value.
+
+    This is a shortcut function that configures :obj:`GetValueWindow` for
+    string data types. kwargs can be used to pass on other arguments.
+
+    Args:
+        default (str): default unique string. must not be in reserved_values
+        prompt (str): prompt message
+        title (str): title message
+        kwargs (type): other arguments to be passed to :obj:`GetValueWindow`
+
+    Returns:
+        str: selected string value
+
+    Example:
+        >>> forms.ask_for_string(
+        ...     default='some-tag',
+        ...     prompt='Enter new tag name:',
+        ...     title='Tag Manager')
+        ... 'new-tag'
+    """
     return GetValueWindow.show(
         None,
         value_type='string',
@@ -2163,6 +2187,33 @@ def ask_for_string(default=None, prompt=None, title=None, **kwargs):
 
 def ask_for_unique_string(reserved_values,
                           default=None, prompt=None, title=None, **kwargs):
+    """Ask user to select a unique string value.
+
+    This is a shortcut function that configures :obj:`GetValueWindow` for
+    unique string data types. kwargs can be used to pass on other arguments.
+
+    Args:
+        reserved_values (list[str]): list of reserved (forbidden) values
+        default (str): default unique string. must not be in reserved_values
+        prompt (str): prompt message
+        title (str): title message
+        kwargs (type): other arguments to be passed to :obj:`GetValueWindow`
+
+    Returns:
+        str: selected unique string
+
+    Example:
+        >>> forms.ask_for_unique_string(
+        ...     prompt='Enter a Unique Name',
+        ...     title=self.Title,
+        ...     reserved_values=['Ehsan', 'Gui', 'Guido'],
+        ...     owner=self)
+        ... 'unique string'
+
+        In example above, owner argument is provided to be passed to underlying
+        :obj:`GetValueWindow`.
+
+    """
     return GetValueWindow.show(
         None,
         value_type='string',
@@ -2175,6 +2226,30 @@ def ask_for_unique_string(reserved_values,
 
 
 def ask_for_one_item(items, default=None, prompt=None, title=None, **kwargs):
+    """Ask user to select an item from a list of items.
+
+    This is a shortcut function that configures :obj:`GetValueWindow` for
+    'single-select' data types. kwargs can be used to pass on other arguments.
+
+    Args:
+        items (list[str]): list of items to choose from
+        default (str): default selected item
+        prompt (str): prompt message
+        title (str): title message
+        kwargs (type): other arguments to be passed to :obj:`GetValueWindow`
+
+    Returns:
+        str: selected item
+
+    Example:
+        >>> forms.ask_for_one_item(
+        ...     ['test item 1', 'test item 2', 'test item 3'],
+        ...     default='test item 2',
+        ...     prompt='test prompt',
+        ...     title='test title'
+        ... )
+        ... 'test item 1'
+    """
     return GetValueWindow.show(
         items,
         value_type='dropdown',
@@ -2186,6 +2261,25 @@ def ask_for_one_item(items, default=None, prompt=None, title=None, **kwargs):
 
 
 def ask_for_date(default=None, prompt=None, title=None, **kwargs):
+    """Ask user to select a date value.
+
+    This is a shortcut function that configures :obj:`GetValueWindow` for
+    date data types. kwargs can be used to pass on other arguments.
+
+    Args:
+        default (datetime.datetime): default selected date value
+        prompt (str): prompt message
+        title (str): title message
+        kwargs (type): other arguments to be passed to :obj:`GetValueWindow`
+
+    Returns:
+        datetime.datetime: selected date
+
+    Example:
+        >>> forms.ask_for_date(default="", title="Enter deadline:")
+        ... datetime.datetime(2019, 5, 17, 0, 0)
+    """
+    # FIXME: window does not set default value
     return GetValueWindow.show(
         None,
         value_type='date',
@@ -2197,4 +2291,9 @@ def ask_for_date(default=None, prompt=None, title=None, **kwargs):
 
 
 def inform_wip():
+    """Show work-in-progress prompt to user and exit script.
+
+    Example:
+        >>> forms.inform_wip()
+    """
     alert("Work in progress.", exitscript=True)
