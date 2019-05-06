@@ -56,6 +56,7 @@ deeper into pyRevit inner workings.
 * :doc:`pyrevit/coreutils`
 * :doc:`pyrevit/forms`
 * :doc:`pyrevit/framework`
+* :doc:`pyrevit/loader`
 * :doc:`pyrevit/output`
 * :doc:`pyrevit/revit`
 * :doc:`pyrevit/script`
@@ -73,6 +74,7 @@ deeper into pyRevit inner workings.
     pyrevit/coreutils.rst
     pyrevit/forms.rst
     pyrevit/framework.rst
+    pyrevit/loader.rst
     pyrevit/output.rst
     pyrevit/revit.rst
     pyrevit/script.rst
