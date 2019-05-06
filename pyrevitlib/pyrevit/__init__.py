@@ -38,6 +38,7 @@ except ImportError:
 
 
 PYREVIT_ADDON_NAME = 'pyRevit'
+PYREVIT_CLI_NAME = 'pyrevit.exe'
 
 # extract version from version file
 VERSION_STRING = '0.0.'
@@ -90,6 +91,8 @@ sys.path.append(BIN_DIR)
 sys.path.append(ADDIN_DIR)
 sys.path.append(ENGINES_DIR)
 
+
+PYREVIT_CLI_PATH = op.join(BIN_DIR, PYREVIT_CLI_NAME)
 
 # now we can start importing stuff
 from pyrevit.compat import safe_strtype
