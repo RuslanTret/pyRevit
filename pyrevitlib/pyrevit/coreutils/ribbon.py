@@ -1248,21 +1248,30 @@ class _PyRevitUI(_GenericPyRevitUIContainer):
 # to interact with current ui --------------------------------------------------
 def get_current_ui(all_native=False):
     """Revit UI Wrapper class for interacting with current pyRevit UI.
+
     Returned class provides min required functionality for user interaction
 
-    :Example:
+    Example:
+        >>> current_ui = pyrevit.session.current_ui()
+        >>> this_script = pyrevit.session.get_this_command()
+        >>> current_ui.update_button_icon(this_script, new_icon)
 
-        current_ui = pyrevit.session.current_ui()
-        this_script = pyrevit.session.get_this_command()
-        current_ui.update_button_icon(this_script, new_icon)
-
-    :return: Returns an instance of _PyRevitUI that contains info on current ui
-    :rtype: _PyRevitUI
+    Returns:
+        :obj:`_PyRevitUI`: wrapper around active ribbon gui
     """
     return _PyRevitUI(all_native=all_native)
 
 
 def get_uibutton(command_unique_name):
+    """Find and return ribbon ui button with given unique id.
+
+    Args:
+        command_unique_name (str): unique id of pyRevit command
+
+    Returns:
+        :obj:`_PyRevitRibbonButton`: ui button wrapper object
+    """
+    # FIXME: verify return type
     pyrvt_tabs = get_current_ui().get_pyrevit_tabs()
     for tab in pyrvt_tabs:
         button = tab.find_child(command_unique_name)
