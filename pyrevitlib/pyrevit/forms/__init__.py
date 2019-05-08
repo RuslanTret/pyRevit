@@ -1041,9 +1041,10 @@ class ProgressBar(TemplatePromptBar):
 
     @staticmethod
     def _make_return_getter(f, ret):
-        # WIP
+        # FIXME: WIP, cleanup docs
         @wraps(f)
         def wrapped_f(*args, **kwargs):
+            """Whatever this is"""
             ret.append(f(*args, **kwargs))
         return wrapped_f
 
