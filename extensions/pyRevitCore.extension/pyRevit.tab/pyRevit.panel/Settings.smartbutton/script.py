@@ -147,7 +147,7 @@ class SettingsWindow(forms.WPFWindow):
                     break
 
             # if addin-file is not writable, lock changing of the engine
-            if not user_config.is_attachment_writable(attachment):
+            if attachment.IsReadOnly():
                 self.availableEngines.IsEnabled = False
 
             # now select the current runtime engine

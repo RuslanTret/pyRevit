@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Security.AccessControl;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -54,6 +56,12 @@ namespace pyRevitLabs.TargetApps.Revit {
 
         public void SetClone(PyRevitClone clone) {
             _clone = clone;
+        }
+
+        public bool IsReadOnly() {
+            // determine if attachment can be modified by user
+            var us = new UserSecurity();
+            return us.HasAccess(new FileInfo(Manifest.FilePath), FileSystemRights.Write);
         }
     }
 }
