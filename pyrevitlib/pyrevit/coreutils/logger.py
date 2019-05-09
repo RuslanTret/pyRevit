@@ -243,7 +243,7 @@ def get_logger(logger_name):
     """Register and return a logger with given name.
 
     Caches all registered loggers and returns the same logger object on
-     second call with the same logger name.
+    second call with the same logger name.
 
     Args:
         logger_name (str): logger name
