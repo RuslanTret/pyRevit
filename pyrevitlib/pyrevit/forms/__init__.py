@@ -1819,12 +1819,13 @@ def select_parameter(src_element,
         list[:obj:`ParamDef`]: list of paramdef objects
 
     Example:
-        >>> selected_params = forms.select_parameter(
+        >>> forms.select_parameter(
         ...     src_element,
         ...     title='Select Parameters',
         ...     multiple=True,
         ...     include_instance=True,
-        ...     include_type=True)
+        ...     include_type=True
+        ... )
         ... [<ParamDef >, <ParamDef >]
     """
     param_defs = []

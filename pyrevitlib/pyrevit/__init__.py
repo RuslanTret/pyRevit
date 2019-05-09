@@ -109,7 +109,7 @@ TRACEBACK_TITLE = 'Traceback:'
 
 # General Exceptions
 class PyRevitException(Exception):
-    """Base class for all pyRevit Exceptions.
+    """Common base class for all pyRevit exceptions.
 
     Parameters args and message are derived from Exception class.
     """
@@ -138,7 +138,7 @@ class PyRevitException(Exception):
 
 
 class PyRevitIOError(PyRevitException):
-    """Generic IO error in pyRevit."""
+    """Common base class for all pyRevit io-related exceptions."""
 
     pass
 

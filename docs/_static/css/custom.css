@@ -86,7 +86,7 @@ em {
 }
 
 .rst-content dl:not(.docutils) dt .headerlink {
-    color: white;
+    color:  #23303d;
 }
 
 .wy-nav-side {
