@@ -1894,6 +1894,9 @@ def alert(msg, title=None, sub_msg=None, expanded=None, footer='',
         title = cmd_name if cmd_name else 'pyRevit'
     tdlg = UI.TaskDialog(title)
 
+    # process input types
+    just_ok = ok and not any([cancel, yes, no, retry])
+
     options = options or []
     # add command links if any
     if options:
@@ -1941,13 +1944,15 @@ def alert(msg, title=None, sub_msg=None, expanded=None, footer='',
 
     # PROCESS REPONSES
     # positive response
+    mlogger.debug('alert result: %s', res)
     if res == UI.TaskDialogResult.Ok \
             or res == UI.TaskDialogResult.Yes \
             or res == UI.TaskDialogResult.Retry:
-        if not exitscript:
-            return True
-        else:
-            sys.exit()
+        if just_ok:
+            if not exitscript:
+                return True
+            else:
+                sys.exit()
     # negative response
     elif res == coreutils.get_enum_none(UI.TaskDialogResult) \
             or res == UI.TaskDialogResult.Cancel \
