@@ -345,6 +345,10 @@ def verify_configs(config_file_path=None):
     if not parser.usagelogging.has_option(consts.ConfigsUsageLogServerUrlKey):
         parser.usagelogging.set_option(consts.ConfigsUsageLogServerUrlKey, "")
 
+    # theme
+    if not parser.core.has_option(consts.ConfigsActiveTheme):
+        parser.core.set_option(consts.ConfigsActiveTheme, "")
+
     # save config into config file
     if config_file_path:
         parser.save_changes()

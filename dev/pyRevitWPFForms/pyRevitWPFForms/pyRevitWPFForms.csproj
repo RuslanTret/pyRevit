@@ -152,17 +152,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\..\..\extensions\pyRevitTools.extension\pyRevit.tab\Modify.panel\edit2.stack3\Edit.pulldown\Swap Line Styles.pushbutton\ConvertLineStyles.xaml">
+    <Page Include="..\..\..\extensions\pyRevitTools.extension\pyRevit.tab\Modify.panel\edit2.stack3\Edit.pulldown\Convert Line Styles.pushbutton\ConvertLineStyles.xaml">
       <Link>Tools\ConvertLineStyles.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\..\..\extensions\pyRevitTools.extension\pyRevit.tab\Modify.panel\Match.pushbutton\MatchConfigWindow.xaml">
+    <Page Include="..\..\..\extensions\pyRevitTools.extension\pyRevit.tab\Modify.panel\Match.splitpushbutton\Match.pushbutton\MatchConfigWindow.xaml">
       <Link>Tools\MatchConfigWindow.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\..\..\extensions\pyRevitTools.extension\pyRevit.tab\Modify.panel\Match.pushbutton\MatchConfigWindowLegacy.xaml">
+    <Page Include="..\..\..\extensions\pyRevitTools.extension\pyRevit.tab\Modify.panel\Match.splitpushbutton\Match.pushbutton\MatchConfigWindowLegacy.xaml">
       <Link>Tools\MatchConfigWindowLegacy.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

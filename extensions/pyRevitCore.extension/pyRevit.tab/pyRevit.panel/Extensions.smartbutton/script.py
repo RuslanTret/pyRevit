@@ -51,6 +51,9 @@ class ExtensionPackageListItem:
         elif self.ext_pkg.type == \
                 exts.ExtensionTypes.RUN_EXTENSION:
             self.Type = 'CLI Run Commands'
+        elif self.ext_pkg.type == \
+                exts.ExtensionTypes.THEME_EXTENSION:
+            self.Type = 'Theme'
 
         # setting up other list data
         self.Builtin = self.ext_pkg.builtin
@@ -185,8 +188,11 @@ class ExtensionsWindow(forms.WPFWindow):
         # Update the author and profile link
         if ext_pkg_item.Author:
             self.ext_author_t.Text = ext_pkg_item.Author
-            self.ext_authorlink_hl.NavigateUri = \
-                framework.Uri(ext_pkg_item.ext_pkg.author_profile)
+            if ext_pkg_item.ext_pkg.author_profile:
+                self.ext_authorlink_hl.NavigateUri = \
+                    framework.Uri(ext_pkg_item.ext_pkg.author_profile)
+            else:
+                self.ext_authorlink_hl.NavigateUri = None
         else:
             self.ext_author_t.Text = ''
 
@@ -253,7 +259,8 @@ class ExtensionsWindow(forms.WPFWindow):
                     self.show_element(self.ext_remove_b)
 
                 # Action Button: Toggle (Enable / Disable)
-                if ext_pkg_item.ext_pkg.is_cli_ext:
+                if ext_pkg_item.ext_pkg.is_cli_ext \
+                        or ext_pkg_item.ext_pkg.is_theme_ext:
                     self.hide_element(self.ext_toggle_b)
                 else:
                     self._update_toggle_button(
@@ -440,7 +447,7 @@ def open_ext_dirs_in_explorer(ext_dirs_list):
         coreutils.open_folder_in_explorer(ext_dir)
 
 
-PYREVIT_CORE_RELOAD_COMMAND_NAME = 'pyRevitCorepyRevitpyRevittoolsReload'
+PYREVIT_CORE_RELOAD_COMMAND_NAME = 'pyrevitcorepyrevitpyrevittoolsreload'
 
 
 def call_reload():

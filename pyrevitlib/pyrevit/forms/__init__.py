@@ -225,7 +225,8 @@ class WPFWindow(framework.Windows.Window):
 
     def handle_url_click(self, sender, args): #pylint: disable=unused-argument
         """Callback for handling click on package website url"""
-        return webbrowser.open_new_tab(sender.NavigateUri.AbsoluteUri)
+        if sender.NavigateUri:
+            return webbrowser.open_new_tab(sender.NavigateUri.AbsoluteUri)
 
 
 class TemplateUserInputWindow(WPFWindow):

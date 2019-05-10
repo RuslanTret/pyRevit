@@ -117,6 +117,7 @@ namespace pyRevitLabs.TargetApps.Revit {
         public const string ConfigsUserCanUpdateKey = "usercanupdate";
         public const string ConfigsUserCanExtendKey = "usercanextend";
         public const string ConfigsUserCanConfigKey = "usercanconfig";
+        public const string ConfigsActiveTheme = "theme";
         // pyrevit.exe specific configs
         public const string EnvConfigsSectionName = "environment";
         public const string EnvConfigsInstalledClonesKey = "clones";

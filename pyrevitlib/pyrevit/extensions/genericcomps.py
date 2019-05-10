@@ -15,6 +15,8 @@ mlogger = coreutils.logger.get_logger(__name__)
 
 LayoutDirective = namedtuple('LayoutDirective', ['type', 'item', 'target'])
 
+ContainerTheme = namedtuple('ContainerTheme', ['theme_path', 'icon_file'])
+
 
 class GenericComponent(object):
     type_id = None
@@ -75,7 +77,7 @@ class GenericUIComponent(GenericComponent):
         inside_ext = False
         dir_str = self.directory
         for dname in dir_str.split(op.sep):
-            if exts.UI_EXTENSION_POSTFIX in dname:
+            if exts.ExtensionTypes.UI_EXTENSION.POSTFIX in dname:
                 inside_ext = True
 
             name, ext = op.splitext(dname)
@@ -83,7 +85,7 @@ class GenericUIComponent(GenericComponent):
                 uname += name
             else:
                 continue
-        return coreutils.cleanup_string(uname)
+        return coreutils.cleanup_string(uname).lower()
 
     @property
     def bundle_name(self):
@@ -124,6 +126,7 @@ class GenericUIContainer(GenericUIComponent):
         self._sub_components = []
         self.layout = self.layout_items = None
         self.name = self.ui_title = None
+        self.theme = None
 
     def __init_from_dir__(self, ext_dir):
         GenericUIComponent.__init_from_dir__(self, ext_dir)
@@ -150,6 +153,8 @@ class GenericUIContainer(GenericUIComponent):
         self.icon_file = full_file_path if op.exists(full_file_path) else None
         if self.icon_file:
             mlogger.debug('Icon file is: %s:%s', self.name, self.icon_file)
+
+        self.theme = None
 
     def __iter__(self):
         return iter(self._get_components_per_layout())
@@ -242,6 +247,14 @@ class GenericUIContainer(GenericUIComponent):
         else:
             return None
 
+    def set_theme(self, container_themes):
+        self.theme = container_themes.get(self.unique_name, None)
+        mlogger.debug('Setting theme: %s on %s', self.theme, self)
+        if self.theme and self.theme.icon_file:
+            self.icon_file = self.theme.icon_file
+        for component in self.get_components():
+            component.set_theme(container_themes)
+
     def add_component(self, comp):
         for path in self.syspath_search_paths:
             comp.add_syspath(path)
@@ -302,6 +315,7 @@ class GenericUICommand(GenericUIComponent):
         self.doc_string = self.author = None
         self.cmd_help_url = self.cmd_context = None
         self.unique_name = self.unique_avail_name = None
+        self.icon_file = None
         self.class_name = self.avail_class_name = None
         self.beta_cmd = False
         self.requires_clean_engine = False
@@ -506,6 +520,12 @@ class GenericUICommand(GenericUIComponent):
         if path and not self.has_syspath(path):
             mlogger.debug('Appending syspath: %s to %s', path, self)
             self.syspath_search_paths.append(path)
+
+    def set_theme(self, container_themes):
+        self.theme = container_themes.get(self.unique_name, None)
+        mlogger.debug('Setting theme: %s on %s', self.theme, self)
+        if self.theme and self.theme.icon_file:
+            self.icon_file = self.theme.icon_file
 
     def configure(self, config_dict):
         templates = config_dict.get(exts.EXT_MANIFEST_TEMPLATES_KEY, None)
