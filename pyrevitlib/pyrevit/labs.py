@@ -14,6 +14,7 @@ clr.AddReference('Nlog')
 clr.AddReference('MadMilkman.Ini')
 clr.AddReference('OpenMcdf')
 clr.AddReference('MahApps.Metro')
+clr.AddReference('Diff.Match.Patch')
 clr.AddReference('pyRevitLabs.Common')
 clr.AddReference('pyRevitLabs.CommonCLI')
 clr.AddReference('pyRevitLabs.CommonWPF')
@@ -25,13 +26,13 @@ import NLog
 import MadMilkman.Ini
 import OpenMcdf
 import MahApps.Metro
+import DiffMatchPatch
 from pyRevitLabs import Common
 from pyRevitLabs import CommonCLI
 from pyRevitLabs import CommonWPF
 from pyRevitLabs import Language
 from pyRevitLabs import DeffrelDB
 from pyRevitLabs import TargetApps
-
 
 mlogger = logger.get_logger(__name__)
 

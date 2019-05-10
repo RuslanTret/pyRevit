@@ -12,14 +12,16 @@ from collections import defaultdict
 
 from pyrevit import HOST_APP
 from pyrevit import framework
-from pyrevit.framework import System
 from pyrevit.coreutils import loadertypes
+from pyrevit.framework import System, Media
+from pyrevit.framework import Documents
 from pyrevit import coreutils
 from pyrevit import revit, DB, UI
 from pyrevit import forms
 from pyrevit import script
 
 from pyrevit.coreutils.loadertypes import UIDocUtils
+from pyrevit.labs import DiffMatchPatch as DMP
 
 import keynotesdb as kdb
 
@@ -708,6 +710,52 @@ class KeynoteManagerWindow(forms.WPFWindow):
 
     # gui event handlers
 
+    def _diff_wordMode(self, text1, text2):
+        dmp = DMP.DiffMatchPatchModule.Default
+        diffs = dmp.DiffMain(text1, text2)
+        dmp.DiffCleanupSemantic(diffs)
+        return diffs
+
+    def _update_diff(self):
+        tt = "AUTOMATIC EMERGENCY SHUTOFF VALVE W/ SIGNAGE FOR FIRE TABLE MIN 10', MAX 50' FROM APPLIANCE; RECESSED FIRE EXTINGUISHER MAX 75' FROM APPLIANCE ALONG EGRESS PATH; VERIFY LOCATION W/ OWNER (COORD. W/ FIRE MARSHAL) PRIOR TO INSTALLATION"
+        if self.selected_keynote:
+            # FIXME: actual diff against history
+            # reset text
+            tr = Documents.TextRange(
+                self.keynoteDiff.Document.ContentStart,
+                self.keynoteDiff.Document.ContentEnd)
+            tr.Text = ''
+
+            # calc diffs
+            diffs = self._diff_wordMode(self.selected_keynote.text, tt)
+            # set colored text
+            for diff in diffs:
+                tr = Documents.TextRange(
+                    self.keynoteDiff.Document.ContentEnd,
+                    self.keynoteDiff.Document.ContentEnd)
+                tr.Text = diff.Text
+                if diff.Operation == DMP.Operation.Equal:
+                    tr.ApplyPropertyValue(
+                        Documents.TextElement.BackgroundProperty,
+                        Media.Brushes.White)
+                    tr.ApplyPropertyValue(
+                        Documents.TextElement.ForegroundProperty,
+                        Media.Brushes.Black)
+                elif diff.Operation == DMP.Operation.Insert:
+                    tr.ApplyPropertyValue(
+                        Documents.TextElement.BackgroundProperty,
+                        Media.Brushes.YellowGreen)
+                    tr.ApplyPropertyValue(
+                        Documents.TextElement.ForegroundProperty,
+                        Media.Brushes.OliveDrab)
+                elif diff.Operation == DMP.Operation.Delete:
+                    tr.ApplyPropertyValue(
+                        Documents.TextElement.BackgroundProperty,
+                        Media.Brushes.Salmon)
+                    tr.ApplyPropertyValue(
+                        Documents.TextElement.ForegroundProperty,
+                        Media.Brushes.Firebrick)
+
     def search_txt_changed(self, sender, args):
         """Handle text change in search box."""
         logger.debug('New search term: %s', self.search_term)
@@ -752,9 +800,19 @@ class KeynoteManagerWindow(forms.WPFWindow):
             else:
                 self.catEditButtons.IsEnabled = True
                 self.keynoteEditButtons.IsEnabled = False
+            # FIXME: if history is enabled
+            self.show_element(self.keynoteHist)
+            self.keynoteCommits.ItemsSource = [
+                '2019/01/01 18:00 eirannejad',
+                '2018/12/29 12:30 joebrr',
+                '2019/12/22 14:00 eirannejad',
+                ]
+            self._update_diff()
         else:
             self.keynoteEditButtons.IsEnabled = False
             self.catEditButtons.IsEnabled = False
+            # FIXME: if history is enabled
+            self.hide_element(self.keynoteHist)
 
     def refresh(self, sender, args):
         if self._conn:

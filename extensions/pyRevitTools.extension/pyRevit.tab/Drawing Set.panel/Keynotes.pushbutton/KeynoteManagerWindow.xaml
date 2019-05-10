@@ -232,6 +232,10 @@
                       ItemTemplate="{StaticResource treeViewItem}"
                       ItemContainerStyle="{StaticResource comboItemStyle}"
                       SelectionChanged="selected_category_changed"/>
+            <DockPanel x:Name="keynoteHist" DockPanel.Dock="Bottom" Height="200" Visibility="Collapsed">
+                <ListView x:Name="keynoteCommits" DockPanel.Dock="Left" Width="200"/>
+                <RichTextBox x:Name="keynoteDiff" />
+            </DockPanel>
             <TreeView x:Name="keynotes_tv" Grid.Row="2" BorderBrush="LightGray" BorderThickness="1,0,1,1"
                       ScrollViewer.HorizontalScrollBarVisibility="Auto"
                       Padding="0,0,0,0"
