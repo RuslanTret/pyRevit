@@ -84,7 +84,10 @@ DEFAULT_TOOLTIP_IMAGE_FILE = 'tooltip.png'
 DEFAULT_TOOLTIP_VIDEO_FILE = 'tooltip.swf'
 if not EXEC_PARAMS.doc_mode and HOST_APP.is_newer_than(2019, or_equal=True):
     DEFAULT_TOOLTIP_VIDEO_FILE = 'tooltip.mp4'
-        
+
+
+# unique ids
+UNIQUE_ID_SEPARATOR = '-'
 
 # Command supported languages
 PYTHON_LANG = 'python'

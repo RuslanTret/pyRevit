@@ -73,7 +73,7 @@ class GenericUIComponent(GenericComponent):
             unique name =
             pyRevitpyRevitEditFlipdoors
         """
-        uname = ''
+        pieces = []
         inside_ext = False
         dir_str = self.directory
         for dname in dir_str.split(op.sep):
@@ -82,10 +82,13 @@ class GenericUIComponent(GenericComponent):
 
             name, ext = op.splitext(dname)
             if ext != '' and inside_ext:
-                uname += name
+                pieces.append(name)
             else:
                 continue
-        return coreutils.cleanup_string(uname).lower()
+        return coreutils.cleanup_string(
+            exts.UNIQUE_ID_SEPARATOR.join(pieces),
+            skip=[exts.UNIQUE_ID_SEPARATOR]
+            ).lower()
 
     @property
     def bundle_name(self):
