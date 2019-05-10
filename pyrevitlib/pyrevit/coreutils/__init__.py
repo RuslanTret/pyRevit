@@ -4,7 +4,7 @@ Example:
     >>> from pyrevit import coreutils
     >>> coreutils.cleanup_string('some string')
 """
-
+#pylint: disable=invalid-name
 import os
 import os.path as op
 import re
@@ -18,7 +18,7 @@ import stat
 import codecs
 import math
 from collections import defaultdict
-import _winreg as wr
+import _winreg as wr     #pylint: disable=import-error
 
 #pylint: disable=E0401
 from pyrevit import HOST_APP, PyRevitException
@@ -49,7 +49,7 @@ UNICODE_NONPRINTABLE_CHARS = [
     ]
 
 
-class Timer:
+class Timer(object):
     """Timer class using python native time module.
 
     Example:
@@ -71,7 +71,7 @@ class Timer:
         return time.time() - self.start
 
 
-class ScriptFileParser:
+class ScriptFileParser(object):
     """Parse python script to extract variables and docstrings.
 
     Primarily designed to assist pyRevit in determining script configurations
@@ -828,6 +828,7 @@ def fully_remove_dir(dir_path):
         dir_path (str): directory path
     """
     def del_rw(action, name, exc):   #pylint: disable=W0613
+        """Force delete entry."""
         os.chmod(name, stat.S_IWRITE)
         os.remove(name)
 
@@ -845,9 +846,12 @@ def cleanup_filename(file_name):
 
     Example:
         >>> cleanup_filename('Myfile-(3).txt')
-        "Myfile3.txt"
+        "Myfile(3).txt"
+
+        >>> cleanup_filename('Perforations 1/8" (New)')
+        "Perforations 18 (New).txt"
     """
-    return re.sub(r'[^\w_.)( -#]', '', file_name)
+    return re.sub(r'[^\w_.() -#]|["]', '', file_name)
 
 
 def _inc_or_dec_string(str_id, shift):
@@ -1359,7 +1363,7 @@ def is_box_visible_on_screens(left, top, width, height):
 
 def fuzzy_search_ratio(target_string, sfilter):
     """Match target string against the filter and return a match ratio.
-    
+
     Args:
         target_string (str): target string
         sfilter (str): search term
