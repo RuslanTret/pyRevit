@@ -85,7 +85,7 @@ class GenericUIComponent(GenericComponent):
                 uname += name
             else:
                 continue
-        return coreutils.cleanup_string(uname)
+        return coreutils.cleanup_string(uname).lower()
 
     @property
     def bundle_name(self):
