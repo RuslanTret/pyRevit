@@ -1948,19 +1948,18 @@ def alert(msg, title=None, sub_msg=None, expanded=None, footer='',
     if res == UI.TaskDialogResult.Ok \
             or res == UI.TaskDialogResult.Yes \
             or res == UI.TaskDialogResult.Retry:
-        if just_ok:
-            if not exitscript:
-                return True
-            else:
-                sys.exit()
+        if just_ok and exitscript:
+            sys.exit()
+        return True
     # negative response
     elif res == coreutils.get_enum_none(UI.TaskDialogResult) \
             or res == UI.TaskDialogResult.Cancel \
             or res == UI.TaskDialogResult.No:
-        if not exitscript:
-            return False
-        else:
+        if exitscript:
             sys.exit()
+        else:
+            return False
+
     # command link response
     elif 'CommandLink' in str(res):
         tdresults = sorted(
@@ -1969,11 +1968,10 @@ def alert(msg, title=None, sub_msg=None, expanded=None, footer='',
             )
         residx = tdresults.index(res)
         return options[residx]
+    elif exitscript:
+        sys.exit()
     else:
-        if not exitscript:
-            return False
-        else:
-            sys.exit()
+        return False
 
 
 def alert_ifnot(condition, msg, *args, **kwargs):
@@ -2016,7 +2014,7 @@ def pick_folder(title=None):
         fb_dlg = CPDialogs.CommonOpenFileDialog()
         fb_dlg.IsFolderPicker = True
         if title:
-            fb_dlg.Description = title
+            fb_dlg.Title = title
         if fb_dlg.ShowDialog() == CPDialogs.CommonFileDialogResult.Ok:
             return fb_dlg.FileName
     else:
