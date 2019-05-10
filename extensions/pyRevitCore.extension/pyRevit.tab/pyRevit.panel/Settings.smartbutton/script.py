@@ -24,7 +24,7 @@ logger = script.get_logger()
 Revit = TargetApps.Revit
 
 
-PYREVIT_CORE_RELOAD_COMMAND_NAME = 'pyRevitCorepyRevitpyRevittoolsReload'
+PYREVIT_CORE_RELOAD_COMMAND_NAME = 'pyrevitcorepyrevitpyrevittoolsreload'
 
 
 class EnvVariable:

@@ -409,7 +409,7 @@ def find_pyrevitcmd(pyrevitcmd_unique_id):
     instantiated before use.
 
     Example:
-        >>> cmd = find_pyrevitcmd('pyRevitCorepyRevitpyRevittoolsReload')
+        >>> cmd = find_pyrevitcmd('pyrevitcorepyrevitpyrevittoolsreload')
         >>> command_instance = cmd()
         >>> command_instance.Execute() # Provide commandData, message, elements
 

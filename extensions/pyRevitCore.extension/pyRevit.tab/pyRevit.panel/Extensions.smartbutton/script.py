@@ -440,7 +440,7 @@ def open_ext_dirs_in_explorer(ext_dirs_list):
         coreutils.open_folder_in_explorer(ext_dir)
 
 
-PYREVIT_CORE_RELOAD_COMMAND_NAME = 'pyRevitCorepyRevitpyRevittoolsReload'
+PYREVIT_CORE_RELOAD_COMMAND_NAME = 'pyrevitcorepyrevitpyrevittoolsreload'
 
 
 def call_reload():
