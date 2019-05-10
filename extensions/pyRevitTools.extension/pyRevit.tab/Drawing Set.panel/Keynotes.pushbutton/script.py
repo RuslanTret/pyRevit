@@ -797,17 +797,19 @@ class KeynoteManagerWindow(forms.WPFWindow):
             if self.selected_keynote.parent_key:
                 self.catEditButtons.IsEnabled = False
                 self.keynoteEditButtons.IsEnabled = True
+
+                # FIXME: if history is enabled
+                self.show_element(self.keynoteHist)
+                self.keynoteCommits.ItemsSource = [
+                    '2019/01/01 18:00 eirannejad',
+                    '2018/12/29 12:30 joebrr',
+                    '2019/12/22 14:00 eirannejad',
+                    ]
+                self._update_diff()
+
             else:
                 self.catEditButtons.IsEnabled = True
                 self.keynoteEditButtons.IsEnabled = False
-            # FIXME: if history is enabled
-            self.show_element(self.keynoteHist)
-            self.keynoteCommits.ItemsSource = [
-                '2019/01/01 18:00 eirannejad',
-                '2018/12/29 12:30 joebrr',
-                '2019/12/22 14:00 eirannejad',
-                ]
-            self._update_diff()
         else:
             self.keynoteEditButtons.IsEnabled = False
             self.catEditButtons.IsEnabled = False
