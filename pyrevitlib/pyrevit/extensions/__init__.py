@@ -1,37 +1,19 @@
 """Base module for handling extensions parsing."""
+from collections import namedtuple
+
 from pyrevit import HOST_APP, EXEC_PARAMS
 
 # Extension types
 # ------------------------------------------------------------------------------
-LIB_EXTENSION_POSTFIX = '.lib'
-UI_EXTENSION_POSTFIX = '.extension'
 
-
-class UIExtensionType:
-    ID = 'extension'
-    POSTFIX = '.extension'
-
-
-class LIBExtensionType:
-    ID = 'lib'
-    POSTFIX = '.lib'
-
-
-class RUNExtensionType:
-    ID = 'run'
-    POSTFIX = '.run'
-
-
-class THEMEExtensionType:
-    ID = 'theme'
-    POSTFIX = '.theme'
+ExtensionType = namedtuple('ExtensionType', ['ID', 'POSTFIX'])
 
 
 class ExtensionTypes:
-    UI_EXTENSION = UIExtensionType
-    LIB_EXTENSION = LIBExtensionType
-    RUN_EXTENSION = RUNExtensionType
-    THEME_EXTENSION = THEMEExtensionType
+    UI_EXTENSION = ExtensionType(ID='extension', POSTFIX='.extension')
+    LIB_EXTENSION = ExtensionType(ID='lib', POSTFIX='.lib')
+    RUN_EXTENSION = ExtensionType(ID='run', POSTFIX='.run')
+    THEME_EXTENSION = ExtensionType(ID='theme', POSTFIX='.theme')
 
     @classmethod
     def get_ext_types(cls):
@@ -51,9 +33,7 @@ class ExtensionTypes:
         """Check if this is a pyRevit theme extension."""
         return ext_type == cls.THEME_EXTENSION
 
-
-# UI_EXTENSION_POSTFIX components
-# ------------------------------------------------------------------------------
+# bundle files
 PYTHON_SCRIPT_FILE_FORMAT = '.py'
 CSHARP_SCRIPT_FILE_FORMAT = '.cs'
 VB_SCRIPT_FILE_FORMAT = '.vb'
@@ -62,13 +42,16 @@ DYNAMO_SCRIPT_FILE_FORMAT = '.dyn'
 YAML_FILE_FORMAT = '.yaml'
 JSON_FILE_FORMAT = '.json'
 
+# extension manifest file
 EXT_MANIFEST_NAME = 'extension'
 EXT_MANIFEST_TEMPLATES_KEY = 'templates'
 EXT_MANIFEST_FILE = EXT_MANIFEST_NAME + JSON_FILE_FORMAT
 
+# extension startup file
 EXT_STARTUP_NAME = 'startup'
 EXT_STARTUP_FILE = EXT_STARTUP_NAME + PYTHON_SCRIPT_FILE_FORMAT
 
+# bundle types
 TAB_POSTFIX = '.tab'
 PANEL_POSTFIX = '.panel'
 LINK_BUTTON_POSTFIX = '.linkbutton'

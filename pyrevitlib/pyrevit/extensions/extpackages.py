@@ -194,6 +194,11 @@ class ExtensionPackage:
         return exts.ExtensionTypes.is_cli_ext(self.type)
 
     @property
+    def is_theme_ext(self):
+        """Check if this is a pyRevit CLI extension."""
+        return exts.ExtensionTypes.is_theme_ext(self.type)
+
+    @property
     def ext_dirname(self):
         """
         Returns:

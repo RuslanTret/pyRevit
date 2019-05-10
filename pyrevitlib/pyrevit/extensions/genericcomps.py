@@ -77,7 +77,7 @@ class GenericUIComponent(GenericComponent):
         inside_ext = False
         dir_str = self.directory
         for dname in dir_str.split(op.sep):
-            if exts.UI_EXTENSION_POSTFIX in dname:
+            if exts.ExtensionTypes.UI_EXTENSION.POSTFIX in dname:
                 inside_ext = True
 
             name, ext = op.splitext(dname)
