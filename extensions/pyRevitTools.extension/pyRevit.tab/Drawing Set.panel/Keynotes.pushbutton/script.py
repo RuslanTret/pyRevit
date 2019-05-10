@@ -13,6 +13,7 @@ from collections import defaultdict
 from pyrevit import HOST_APP
 from pyrevit import framework
 from pyrevit.framework import System
+from pyrevit.coreutils import loadertypes
 from pyrevit import coreutils
 from pyrevit import revit, DB, UI
 from pyrevit import forms
@@ -26,6 +27,8 @@ import keynotesdb as kdb
 __title__ = "Manage\nKeynotes"
 __author__ = "{{author}}"
 __context__ = ""
+__persistentengine__ = True
+
 
 logger = script.get_logger()
 output = script.get_output()
@@ -388,6 +391,14 @@ class KeynoteManagerWindow(forms.WPFWindow):
                 forms.alert("Keynote file is not yet converted.",
                             exitscript=True)
 
+        # create external event objects
+        # __init__ methods is being executed on the Revit thread and happens
+        # before the non-modal .show() that creates a separate UI thread
+        # evenet handlers need to be created here since they are not allowed
+        # to be instantiated from threads other than main
+        self._ext_event_handler = loadertypes.PlaceKeynoteExternalEvent()
+        self._ext_event = UI.ExternalEvent.Create(self._ext_event_handler)
+
         self._cache = []
         self._allcat = kdb.RKeynote(key='', text='-- ALL CATEGORIES --',
                                     parent_key='',
@@ -396,8 +407,7 @@ class KeynoteManagerWindow(forms.WPFWindow):
 
         self._needs_update = False
         self._config = script.get_config()
-        self._used_keysdict = self.get_used_keynote_elements()
-        self.load_config(reset_config)
+        self._load_config(reset_config)
         self.search_tb.Focus()
 
     @property
@@ -480,6 +490,10 @@ class KeynoteManagerWindow(forms.WPFWindow):
             return []
 
     @property
+    def used_keynotes(self):
+        return self._get_used_keynote_elements()
+
+    @property
     def current_keynotes(self):
         return self.keynotes_tv.ItemsSource
 
@@ -487,14 +501,14 @@ class KeynoteManagerWindow(forms.WPFWindow):
     def keynote_text_with(self):
         return 200
 
-    def get_used_keynote_elements(self):
+    def _get_used_keynote_elements(self):
         used_keys = defaultdict(list)
         for knote in revit.query.get_used_keynotes(doc=revit.doc):
             key = knote.Parameter[DB.BuiltInParameter.KEY_VALUE].AsString()
             used_keys[key].append(knote.Id)
         return used_keys
 
-    def save_config(self):
+    def _save_config(self):
         # save self.window_geom
         new_window_geom_dict = {}
         # cleanup removed keynote files
@@ -535,7 +549,7 @@ class KeynoteManagerWindow(forms.WPFWindow):
 
         script.save_config()
 
-    def load_config(self, reset_config):
+    def _load_config(self, reset_config):
         # load last window geom
         if reset_config:
             last_window_geom_dict = {}
@@ -670,7 +684,7 @@ class KeynoteManagerWindow(forms.WPFWindow):
 
         # mark used keynotes
         for knote in active_tree:
-            knote.update_used(self._used_keysdict)
+            knote.update_used(self.used_keynotes)
 
         # filter keynotes
         self._cache = list(active_tree)
@@ -685,6 +699,14 @@ class KeynoteManagerWindow(forms.WPFWindow):
 
         # show keynotes
         self.keynotes_tv.ItemsSource = filtered_keynotes
+
+    def _update_model(self):
+        pass
+        # if self._needs_update:
+        #     with revit.Transaction('Update Keynotes'):
+        #         revit.update.update_linked_keynotes(doc=revit.doc)
+
+    # gui event handlers
 
     def search_txt_changed(self, sender, args):
         """Handle text change in search box."""
@@ -932,9 +954,8 @@ class KeynoteManagerWindow(forms.WPFWindow):
 
     def show_keynote(self, sender, args):
         if self.selected_keynote:
-            self.Close()
-            kids = self.get_used_keynote_elements() \
-                       .get(self.selected_keynote.key, [])
+            # self.Close()
+            kids = self.used_keynotes.get(self.selected_keynote.key, [])
             for kid in kids:
                 source = viewname = ''
                 kel = revit.doc.GetElement(kid)
@@ -960,26 +981,36 @@ class KeynoteManagerWindow(forms.WPFWindow):
                 print(report)
 
     def place_keynote(self, sender, args):
-        self.Close()
+        # grab the keynote type and selected keynote key
         keynotes_cat = \
             revit.query.get_category(DB.BuiltInCategory.OST_KeynoteTags)
-        if keynotes_cat and self.selected_keynote:
-            knote_key = self.selected_keynote.key
-            def_kn_typeid = revit.doc.GetDefaultFamilyTypeId(keynotes_cat.Id)
-            kn_type = revit.doc.GetElement(def_kn_typeid)
-            if kn_type:
-                uidoc_utils = UIDocUtils(HOST_APP.uiapp)
-                # place keynotes and get placed keynote elements
-                try:
-                    uidoc_utils.PostCommandAndUpdateNewElementProperties(
-                        revit.doc,
-                        self.postable_keynote_command,
-                        "Update Keynotes",
-                        DB.BuiltInParameter.KEY_VALUE,
-                        knote_key
-                        )
-                except Exception as ex:
-                    forms.alert(str(ex))
+        def_kn_typeid = revit.doc.GetDefaultFamilyTypeId(keynotes_cat.Id)
+
+        # if document has a type for keynotes
+        kn_type = revit.doc.GetElement(def_kn_typeid)
+        if kn_type:
+            knote_type = self.postable_keynote_command
+            if self.selected_keynote and self.selected_keynote.parent_key:
+                knote_key = self.selected_keynote.key
+
+                if self._ext_event and self._ext_event_handler:
+                    self._ext_event_handler.KeynoteKey = knote_key
+                    self._ext_event_handler.KeynoteType = knote_type
+                    self._ext_event.Raise()
+                else:
+                    self.Close()
+                    uidoc_utils = UIDocUtils(HOST_APP.uiapp)
+                    # place keynotes and get placed keynote elements
+                    try:
+                        uidoc_utils.PostCommandAndUpdateNewElementProperties(
+                            revit.doc,
+                            knote_type,
+                            "Update Keynotes",
+                            DB.BuiltInParameter.KEY_VALUE,
+                            knote_key
+                            )
+                    except Exception as ex:
+                        forms.alert(str(ex))
 
     def enable_history(self, sender, args):
         forms.alert("Not yet implemented. Coming soon.")
@@ -992,8 +1023,7 @@ class KeynoteManagerWindow(forms.WPFWindow):
 
     def change_keynote_file(self, sender, args):
         if self._change_kfile():
-            # make sure to relaod on close
-            self._needs_update = True
+            self._update_model()
             self.Close()
 
     def show_keynote_file(self, sender, args):
@@ -1041,16 +1071,9 @@ class KeynoteManagerWindow(forms.WPFWindow):
             except System.TimeoutException as toutex:
                 forms.alert(toutex.Message)
 
-    def update_model(self, sender, args):
-        self.Close()
-
     def window_closing(self, sender, args):
-        if self._needs_update:
-            with revit.Transaction('Update Keynotes'):
-                revit.update.update_linked_keynotes(doc=revit.doc)
-
         try:
-            self.save_config()
+            self._save_config()
         except Exception as saveex:
             logger.debug('Saving configuration failed | %s' % saveex)
             forms.alert(str(saveex))
@@ -1066,7 +1089,7 @@ class KeynoteManagerWindow(forms.WPFWindow):
 try:
     KeynoteManagerWindow(
         xaml_file_name='KeynoteManagerWindow.xaml',
-        reset_config=__shiftclick__ #pylint: disable=undefined-variable
-        ).show(modal=True)
+        reset_config=__shiftclick__, #pylint: disable=undefined-variable
+        ).show(modal=False)
 except Exception as kmex:
     forms.alert(str(kmex))

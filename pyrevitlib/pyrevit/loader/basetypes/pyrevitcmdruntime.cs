@@ -22,6 +22,7 @@ namespace PyRevitBaseClasses {
         private string _cmdUniqueName = null;
         private bool _needsCleanEngine = false;
         private bool _needsFullFrameEngine = false;
+        private bool _needPersistentEngine = false;
 
         private bool _refreshEngine = false;
         private bool _forcedDebugMode = false;
@@ -53,6 +54,7 @@ namespace PyRevitBaseClasses {
                                      string cmdUniqueName,
                                      bool needsCleanEngine,
                                      bool needsFullFrameEngine,
+                                     bool needPersistentEngine,
                                      bool refreshEngine,
                                      bool forcedDebugMode,
                                      bool altScriptMode,
@@ -70,8 +72,9 @@ namespace PyRevitBaseClasses {
             _cmdBundle = cmdBundle;
             _cmdExtension = cmdExtension;
             _cmdUniqueName = cmdUniqueName;
-            _needsCleanEngine = Convert.ToBoolean(needsCleanEngine);
-            _needsFullFrameEngine = Convert.ToBoolean(needsFullFrameEngine);
+            _needsCleanEngine = needsCleanEngine;
+            _needsFullFrameEngine = needsFullFrameEngine;
+            _needPersistentEngine = needPersistentEngine;
 
             _refreshEngine = refreshEngine;
             _forcedDebugMode = forcedDebugMode;
@@ -189,6 +192,12 @@ namespace PyRevitBaseClasses {
             }
         }
 
+        public bool NeedsPersistentEngine {
+            get {
+                return _needPersistentEngine;
+            }
+        }
+
         public bool NeedsRefreshedEngine {
             get {
                 return _refreshEngine;
@@ -218,9 +227,13 @@ namespace PyRevitBaseClasses {
                 // get ScriptOutput from the weak reference
                 ScriptOutput output;
                 var re = _scriptOutput.TryGetTarget(out output);
-                if (re && output != null)
+                // create a new output window if there is none, or previous is closed by user
+                if (re && output != null && !output.ClosedByUser)
                     return output;
                 else {
+                    // cleanup reference
+                    output = null;
+
                     // Stating a new output window
                     var newOutput = new ScriptOutput(DebugMode, UIApp);
 
