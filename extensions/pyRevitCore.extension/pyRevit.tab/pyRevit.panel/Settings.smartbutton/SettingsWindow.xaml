@@ -433,7 +433,7 @@
                     </StackPanel>
                 </Expander>
                 <Separator Margin="10,0,10,0" Background="#dfdfdf"/>
-                <Expander Header="User Experience" IsExpanded="True" Margin="10px">
+                <Expander Header="User Experience" IsExpanded="False" Margin="10px">
                     <StackPanel  Margin="10px">
                         <Grid Margin="0,10,0,0">
                             <Grid.ColumnDefinitions>
@@ -442,12 +442,12 @@
                             </Grid.ColumnDefinitions>
                             <DockPanel Grid.Column="0" Margin="0,0,5,0">
                                 <TextBlock Margin="0,0,10,0" VerticalAlignment="Center" DockPanel.Dock="Left">Active Theme</TextBlock>
-                                <ComboBox x:Name="themeSelector" DisplayMemberPath="name" Height="24" VerticalContentAlignment="Center"/>
+                                <ComboBox x:Name="themeSelector" Height="24" VerticalContentAlignment="Center"/>
                             </DockPanel>
-                            <DockPanel Grid.Column="1"  Margin="5,0,0,0">
+                            <!--<DockPanel Grid.Column="1"  Margin="5,0,0,0">
                                 <TextBlock Margin="0,0,10,0" VerticalAlignment="Center" DockPanel.Dock="Left">Active Locale</TextBlock>
                                 <ComboBox x:Name="localSelector" DisplayMemberPath="name" Height="24" VerticalContentAlignment="Center"/>
-                            </DockPanel>
+                            </DockPanel>-->
                         </Grid>
                         <GroupBox Header="Output Window" Margin="0,10,0,0">
                             <DockPanel Margin="10">

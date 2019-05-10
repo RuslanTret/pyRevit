@@ -11,7 +11,7 @@ from pyrevit import output
 from pyrevit.labs import TargetApps
 from pyrevit.coreutils import envvars
 from pyrevit.userconfig import user_config
-
+import pyrevit.extensions.extpackages as extpkgs
 
 __context__ = 'zerodoc'
 
@@ -173,6 +173,18 @@ class SettingsWindow(forms.WPFWindow):
         self.envvars_lb.ItemsSource = env_vars_list
 
     def _setup_uxsettings(self):
+        # themes
+        ext_pkgs = extpkgs.get_ext_packages()
+        theme_names = [x.name for x in ext_pkgs if x.is_theme_ext]
+        theme_opts = ['<By Extension>']
+        theme_opts.extend(theme_names)
+        self.themeSelector.ItemsSource = theme_opts
+        if user_config.core.theme and user_config.core.theme in theme_names:
+            self.themeSelector.SelectedIndex = \
+                theme_names.index(user_config.core.theme) + 1
+        else:
+            self.themeSelector.SelectedIndex = 0
+
         # output settings
         self.cur_stylesheet_tb.Text = output.get_stylesheet()
 
@@ -423,7 +435,12 @@ class SettingsWindow(forms.WPFWindow):
         user_config.usagelogging.logfilepath = self.usagelogfile_tb.Text
         user_config.usagelogging.logserverurl = self.usagelogserver_tb.Text
 
-        # output settings
+        # ux settings
+        if self.themeSelector.SelectedIndex != 0:
+            user_config.core.theme = self.themeSelector.SelectedItem
+        else:
+            user_config.core.theme = ""
+
         output.set_stylesheet(self.cur_stylesheet_tb.Text)
         if self.cur_stylesheet_tb.Text != output.get_default_stylesheet():
             user_config.core.outputstylesheet = self.cur_stylesheet_tb.Text
