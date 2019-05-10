@@ -21,38 +21,38 @@ namespace pyRevitLabs.TargetApps.Revit {
         // STANDARD PATHS ============================================================================================
         // pyRevit %appdata% path
         // @reviewed
-        public static string pyRevitAppDataPath =>
+        public static string UserDataPath =>
             Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                                          PyRevitConsts.AppdataDirName);
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                                          PyRevitConsts.UserDataDirName);
 
         // pyRevit %programdata% path
         // @reviewed
-        public static string pyRevitProgramDataPath =>
+        public static string ProgramDataPath =>
             Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-                                          PyRevitConsts.AppdataDirName);
+                                          PyRevitConsts.UserDataDirName);
 
         // pyRevit default extensions path
         // @reviewed
-        public static string pyRevitDefaultExtensionsPath =>
-            Path.Combine(pyRevitAppDataPath, PyRevitConsts.ExtensionsDefaultDirName);
+        public static string DefaultExtensionsPath =>
+            Path.Combine(UserDataPath, PyRevitConsts.ExtensionsDefaultDirName);
 
         // pyRevit config file path
         // @reviewed
-        public static string pyRevitConfigFilePath {
+        public static string ConfigFilePath {
             get {
-                var cfgFile = FindConfigFileInDirectory(pyRevitAppDataPath);
-                return cfgFile != null ? cfgFile : Path.Combine(pyRevitAppDataPath, PyRevitConsts.DefaultConfigsFileName);
+                var cfgFile = FindConfigFileInDirectory(UserDataPath);
+                return cfgFile != null ? cfgFile : Path.Combine(UserDataPath, PyRevitConsts.DefaultConfigsFileName);
             }
         }
 
         // pyRevit config file path
         // @reviewed
-        public static string pyRevitSeedConfigFilePath {
+        public static string SeedConfigFilePath {
             get {
-                var cfgFile = FindConfigFileInDirectory(pyRevitProgramDataPath);
-                return cfgFile != null ? cfgFile : Path.Combine(pyRevitProgramDataPath,
+                var cfgFile = FindConfigFileInDirectory(ProgramDataPath);
+                return cfgFile != null ? cfgFile : Path.Combine(ProgramDataPath,
                                                         PyRevitConsts.DefaultConfigsFileName);
             }
         }
@@ -60,13 +60,13 @@ namespace pyRevitLabs.TargetApps.Revit {
         // pyrevit cache folder 
         // @reviewed
         public static string GetCacheDirectory(int revitYear) {
-            return Path.Combine(pyRevitAppDataPath, revitYear.ToString());
+            return Path.Combine(UserDataPath, revitYear.ToString());
         }
 
         // pyrevit logs folder 
         // @reviewed
         public static string GetLogsDirectory() {
-            return Path.Combine(pyRevitAppDataPath, PyRevitConsts.AppdataLogsDirName);
+            return Path.Combine(UserDataPath, PyRevitConsts.AppdataLogsDirName);
         }
 
         // managing clones ===========================================================================================
@@ -88,7 +88,7 @@ namespace pyRevitLabs.TargetApps.Revit {
 
             // determine destination path if not provided
             if (destPath == null)
-                destPath = Path.Combine(pyRevitAppDataPath, PyRevitConsts.DefaultCloneInstallName);
+                destPath = Path.Combine(UserDataPath, PyRevitConsts.DefaultCloneInstallName);
             logger.Debug("Destination path determined as \"{0}\"", destPath);
             // make sure destPath exists
             CommonUtils.EnsurePath(destPath);
@@ -158,7 +158,7 @@ namespace pyRevitLabs.TargetApps.Revit {
 
             // determine destination path if not provided
             if (destPath == null)
-                destPath = Path.Combine(pyRevitAppDataPath, PyRevitConsts.DefaultCopyInstallName);
+                destPath = Path.Combine(UserDataPath, PyRevitConsts.DefaultCopyInstallName);
 
             // check existing destination path
             if (CommonUtils.VerifyPath(destPath)) {
@@ -684,7 +684,7 @@ namespace pyRevitLabs.TargetApps.Revit {
         // @handled @logs
         public static void ClearCache(int revitYear) {
             // make sure all revit instances are closed
-            if (CommonUtils.VerifyPath(pyRevitAppDataPath)) {
+            if (CommonUtils.VerifyPath(UserDataPath)) {
                 RevitController.KillRunningRevits(revitYear);
                 CommonUtils.DeleteDirectory(GetCacheDirectory(revitYear));
             }
@@ -698,15 +698,15 @@ namespace pyRevitLabs.TargetApps.Revit {
         // @handled @logs
         public static void ClearAllCaches() {
             var cacheDirFinder = new Regex(@"\d\d\d\d");
-            if (CommonUtils.VerifyPath(pyRevitAppDataPath)) {
-                foreach (string subDir in Directory.GetDirectories(pyRevitAppDataPath)) {
+            if (CommonUtils.VerifyPath(UserDataPath)) {
+                foreach (string subDir in Directory.GetDirectories(UserDataPath)) {
                     var dirName = Path.GetFileName(subDir);
                     if (cacheDirFinder.IsMatch(dirName))
                         ClearCache(int.Parse(dirName));
                 }
             }
             else
-                throw new pyRevitResourceMissingException(pyRevitAppDataPath);
+                throw new pyRevitResourceMissingException(UserDataPath);
         }
 
         // managing extensions =======================================================================================
@@ -826,7 +826,7 @@ namespace pyRevitLabs.TargetApps.Revit {
             string extDestDirName = PyRevitExtension.MakeConfigName(extensionName, extensionType);
 
             // determine destination
-            destPath = destPath ?? pyRevitDefaultExtensionsPath;
+            destPath = destPath ?? DefaultExtensionsPath;
             string finalExtRepoPath = Path.Combine(destPath, extDestDirName).NormalizeAsPath();
 
             // determine branch name
@@ -1237,13 +1237,13 @@ namespace pyRevitLabs.TargetApps.Revit {
         // deletes config file
         // @handled @logs
         public static void DeleteConfigs() {
-            if (File.Exists(pyRevitConfigFilePath))
+            if (File.Exists(ConfigFilePath))
                 try {
-                    File.Delete(pyRevitConfigFilePath);
+                    File.Delete(ConfigFilePath);
                 }
                 catch (Exception ex) {
                     throw new pyRevitException(string.Format("Failed deleting config file \"{0}\" | {1}",
-                                                              pyRevitConfigFilePath, ex.Message));
+                                                              ConfigFilePath, ex.Message));
                 }
         }
 
@@ -1279,8 +1279,8 @@ namespace pyRevitLabs.TargetApps.Revit {
         public static void SeedConfig(bool makeCurrentUserAsOwner = false, string setupFromTemplate = null) {
             // if setupFromTemplate is not specified: copy current config into Allusers folder
             // if setupFromTemplate is specified: copy setupFromTemplate as the main config
-            string sourceFile = setupFromTemplate != null ? setupFromTemplate : pyRevitConfigFilePath;
-            string targetFile = setupFromTemplate != null ? pyRevitConfigFilePath : pyRevitSeedConfigFilePath;
+            string sourceFile = setupFromTemplate != null ? setupFromTemplate : ConfigFilePath;
+            string targetFile = setupFromTemplate != null ? ConfigFilePath : SeedConfigFilePath;
 
             logger.Debug("Seeding config file \"{0}\" to \"{1}\"", sourceFile, targetFile);
 
@@ -1315,11 +1315,11 @@ namespace pyRevitLabs.TargetApps.Revit {
         // configurations private access methods  ====================================================================
         private static void InitConfigFile() {
             // get allusers seed config file
-            var adminFile = FindConfigFileInDirectory(pyRevitProgramDataPath);
+            var adminFile = FindConfigFileInDirectory(ProgramDataPath);
             if (adminFile != null)
                 SeedConfig(false, setupFromTemplate: adminFile);
             else
-                CommonUtils.EnsureFile(pyRevitConfigFilePath);
+                CommonUtils.EnsureFile(ConfigFilePath);
         }
 
         private static IniFile GetConfigFile() {
@@ -1330,7 +1330,7 @@ namespace pyRevitLabs.TargetApps.Revit {
             IniFile cfgFile = new IniFile(cfgOps);
 
             // default to current user config
-            string configFile = pyRevitConfigFilePath;
+            string configFile = ConfigFilePath;
             // make sure the file exists and if not create an empty one
             if (!CommonUtils.VerifyFile(configFile))
                 InitConfigFile();
@@ -1343,13 +1343,13 @@ namespace pyRevitLabs.TargetApps.Revit {
         // save config file to standard location
         // @handled @logs
         private static void SaveConfigFile(IniFile cfgFile) {
-            logger.Debug("Saving config file \"{0}\"", pyRevitConfigFilePath);
+            logger.Debug("Saving config file \"{0}\"", ConfigFilePath);
             try {
-                cfgFile.Save(pyRevitConfigFilePath);
+                cfgFile.Save(ConfigFilePath);
             }
             catch (Exception ex) {
                 throw new pyRevitException(string.Format("Failed to save config to \"{0}\". | {1}",
-                                                         pyRevitConfigFilePath, ex.Message));
+                                                         ConfigFilePath, ex.Message));
             }
         }
 

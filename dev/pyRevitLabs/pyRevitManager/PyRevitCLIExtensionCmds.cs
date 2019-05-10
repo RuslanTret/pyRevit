@@ -43,7 +43,7 @@ namespace pyRevitManager {
         internal static void
         PrintExtensionSearchPaths() {
             PyRevitCLIAppCmds.PrintHeader("Default Extension Search Path");
-            Console.WriteLine(PyRevit.pyRevitDefaultExtensionsPath);
+            Console.WriteLine(PyRevit.DefaultExtensionsPath);
             PyRevitCLIAppCmds.PrintHeader("Extension Search Paths");
             foreach (var searchPath in PyRevit.GetRegisteredExtensionSearchPaths())
                 Console.WriteLine(searchPath);

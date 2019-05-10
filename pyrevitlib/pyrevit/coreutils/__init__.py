@@ -392,8 +392,8 @@ def find_loaded_asm(asm_info, by_partial_name=False, by_location=False):
                 loaded_asm_list.append(loaded_assembly)
         elif by_location:
             try:
-                if op.normpath(loaded_assembly.Location) == \
-                        op.normpath(asm_info):
+                if op.normpath(loaded_assembly.Location).lower() == \
+                        op.normpath(asm_info).lower():
                     loaded_asm_list.append(loaded_assembly)
             except Exception:
                 continue

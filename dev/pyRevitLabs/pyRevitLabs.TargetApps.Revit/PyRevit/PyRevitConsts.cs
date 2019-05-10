@@ -88,10 +88,10 @@ namespace pyRevitLabs.TargetApps.Revit {
         public const int ConfigsDynamoCompatibleEnginerVer = 273;
 
         // consts for recording pyrevit.exe config in the pyRevit configuration file
-        public const string AppdataDirName = "pyRevit";
-        public const string AppdataLogsDirName = "Logs";
+        public const string UserDataDirName = ".pyrevit";
+        public const string AppdataLogsDirName = "logs";
         // core configs
-        public const string DefaultConfigsFileName = @"pyRevit_config.ini";
+        public const string DefaultConfigsFileName = @"config.ini";
         public const string ConfigsFileRegexPattern = @".*[pyrevit|config].*\.ini";
         public const string ConfigsCoreSection = "core";
         public const string ConfigsCheckUpdatesKey = "checkupdates";
@@ -125,7 +125,7 @@ namespace pyRevitLabs.TargetApps.Revit {
         public const string EnvConfigsTemplateSourcesKey = "templates";
         public const string EnvConfigsExtensionDBFileName = "PyRevitExtensionsDB.json";
         // extensions
-        public const string ExtensionsDefaultDirName = "Extensions";
+        public const string ExtensionsDefaultDirName = "extensions";
         public const string ExtensionJsonDisabledKey = "disabled";
         public const string ExtensionUIPostfix = ".extension";
         public const string ExtensionLibraryPostfix = ".lib";

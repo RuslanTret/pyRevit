@@ -390,8 +390,7 @@ if not EXEC_PARAMS.doc_mode:
     else:
         CONFIG_TYPE = 'New'
         # setup config file name and path
-        CONFIG_FILE = appdata.get_universal_data_file(file_id='config',
-                                                      file_ext='ini')
+        CONFIG_FILE = TargetApps.Revit.PyRevit.ConfigFilePath
 
     mlogger.debug('Using %s config file: %s', CONFIG_TYPE, CONFIG_FILE)
 

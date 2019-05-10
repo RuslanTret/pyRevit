@@ -37,7 +37,7 @@ except ImportError:
     PyRevitLoader = None
 
 
-PYREVIT_ADDON_NAME = 'pyRevit'
+PYREVIT_ADDON_NAME = 'pyrevit'
 PYREVIT_CLI_NAME = 'pyrevit.exe'
 
 # extract version from version file
@@ -498,13 +498,16 @@ EXEC_PARAMS = _ExecutorParams()
 # -----------------------------------------------------------------------------
 # user env paths
 if EXEC_PARAMS.doc_mode:
-    ALLUSER_PROGRAMDATA = USER_ROAMING_DIR = USER_SYS_TEMP = USER_DESKTOP = \
+    ALLUSER_PROGRAMDATA = \
+    USER_PROFILE = USER_DATA_DIR = USER_SYS_TEMP = USER_DESKTOP = \
     EXTENSIONS_DEFAULT_DIR = THIRDPARTY_EXTENSIONS_DEFAULT_DIR = ' '
 else:
     ALLUSER_PROGRAMDATA = os.getenv('programdata')
-    USER_ROAMING_DIR = os.getenv('appdata')
     USER_SYS_TEMP = os.getenv('temp')
+    USER_PROFILE = op.expandvars('%userprofile%')
     USER_DESKTOP = op.expandvars('%userprofile%\\desktop')
+    USER_DATA_DIR = USER_PROFILE
+    USER_DATA_DIRNAME = '.' + PYREVIT_ADDON_NAME
 
     # verify directory per issue #369
     if not USER_DESKTOP or not op.exists(USER_DESKTOP):
@@ -513,15 +516,15 @@ else:
     # default extensions directory
     EXTENSIONS_DEFAULT_DIR = op.join(HOME_DIR, 'extensions')
     THIRDPARTY_EXTENSIONS_DEFAULT_DIR = \
-        op.join(USER_ROAMING_DIR, PYREVIT_ADDON_NAME, 'Extensions')
+        op.join(USER_DATA_DIR, USER_DATA_DIRNAME, 'extensions')
 
 # create paths for pyrevit files
 if EXEC_PARAMS.doc_mode:
     PYREVIT_ALLUSER_APP_DIR = PYREVIT_APP_DIR = PYREVIT_VERSION_APP_DIR = ' '
 else:
     # pyrevit file directory
-    PYREVIT_ALLUSER_APP_DIR = op.join(ALLUSER_PROGRAMDATA, PYREVIT_ADDON_NAME)
-    PYREVIT_APP_DIR = op.join(USER_ROAMING_DIR, PYREVIT_ADDON_NAME)
+    PYREVIT_ALLUSER_APP_DIR = op.join(ALLUSER_PROGRAMDATA, USER_DATA_DIRNAME)
+    PYREVIT_APP_DIR = op.join(USER_DATA_DIR, USER_DATA_DIRNAME)
     PYREVIT_VERSION_APP_DIR = op.join(PYREVIT_APP_DIR, HOST_APP.version)
 
     # add runtime paths to sys.paths

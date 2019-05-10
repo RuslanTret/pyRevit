@@ -63,9 +63,9 @@ def _get_app_file(file_id, file_ext,
     full_filename = '{}{}.{}'.format(file_prefix, file_id, file_ext)
 
     if filename_only:
-        return full_filename
+        return full_filename.lower()
     else:
-        return op.join(appdata_folder, full_filename)
+        return op.join(appdata_folder, full_filename).lower()
 
 
 def _match_file(file_name):
