@@ -29,3 +29,16 @@ Changes listed here were made to the Visual Studio project
     </DefineConstants>
   </PropertyGroup>
   ```
+
+## MahApps.Metro
+
+[See related issues here](https://github.com/eirannejad/pyRevit/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aclosed+MahApps)
+
+`MahApps.Metro` (==1.6.5) was recompile to `pyRevitLabs.MahAppsMetro` (==1.6.5 | .NET 4.7) to avoid the conflict.
+
+Changes listed here were made to the Visual Studio project
+
+- Refactored the root namespace to `pyRevitLabs.MahAppsMetro`
+- Refactored xaml namespaces to `pyRevitLabs.MahAppsMetro`
+- Refactored `StaticResource` and `DynamicResource` references to `pyRevitLabs.MahAppsMetro`
+- Renamed project assembly name to `pyRevitLabs.MahAppsMetro`

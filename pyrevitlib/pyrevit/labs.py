@@ -13,7 +13,7 @@ clr.AddReference('Nett')
 clr.AddReference('Nlog')
 clr.AddReference('MadMilkman.Ini')
 clr.AddReference('OpenMcdf')
-clr.AddReference('MahApps.Metro')
+clr.AddReference('pyRevitLabs.MahAppsMetro')
 clr.AddReference('pyRevitLabs.Common')
 clr.AddReference('pyRevitLabs.CommonCLI')
 clr.AddReference('pyRevitLabs.CommonWPF')
@@ -24,7 +24,7 @@ import Nett
 import NLog
 import MadMilkman.Ini
 import OpenMcdf
-import MahApps.Metro
+import pyRevitLabs.MahAppsMetro
 from pyRevitLabs import Common
 from pyRevitLabs import CommonCLI
 from pyRevitLabs import CommonWPF

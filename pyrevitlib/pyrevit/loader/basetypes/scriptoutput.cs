@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 using System.Net.Cache;
 using System.Diagnostics;
 
-using MahApps.Metro.Controls;
+using pyRevitLabs.MahAppsMetro.Controls;
 using pyRevitLabs.CommonWPF.Controls;
 
 namespace PyRevitBaseClasses {
@@ -46,19 +46,19 @@ namespace PyRevitBaseClasses {
 
         private void SetupDynamicResources() {
             Resources.MergedDictionaries.Add(new ResourceDictionary() {
-                Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml")
+                Source = new Uri("pack://application:,,,/pyRevitLabs.MahAppsMetro;component/Styles/Controls.xaml")
             });
 
             Resources.MergedDictionaries.Add(new ResourceDictionary() {
-                Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml")
+                Source = new Uri("pack://application:,,,/pyRevitLabs.MahAppsMetro;component/Styles/Fonts.xaml")
             });
 
             Resources.MergedDictionaries.Add(new ResourceDictionary() {
-                Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml")
+                Source = new Uri("pack://application:,,,/pyRevitLabs.MahAppsMetro;component/Styles/Colors.xaml")
             });
 
             var accentResDict = new ResourceDictionary() {
-                Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Accents/Steel.xaml")
+                Source = new Uri("pack://application:,,,/pyRevitLabs.MahAppsMetro;component/Styles/Accents/Steel.xaml")
             };
 
             // TODO: read the colors from css? all colors and styles should be in the same place
