@@ -87,7 +87,7 @@ class SettingsWindow(forms.WPFWindow):
         self.set_image_source(self.logverbose, 'logverbose.png')
         self.set_image_source(self.logdebug, 'logdebug.png')
 
-        self._setup_outputsettings()
+        self._setup_uxsettings()
         self._setup_usagelogging()
         self._setup_addinfiles()
 
@@ -172,7 +172,7 @@ class SettingsWindow(forms.WPFWindow):
 
         self.envvars_lb.ItemsSource = env_vars_list
 
-    def _setup_outputsettings(self):
+    def _setup_uxsettings(self):
         # output settings
         self.cur_stylesheet_tb.Text = output.get_stylesheet()
 
