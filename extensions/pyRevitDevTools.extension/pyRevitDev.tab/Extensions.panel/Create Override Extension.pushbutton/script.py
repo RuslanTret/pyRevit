@@ -5,15 +5,13 @@ import os.path as op
 import shutil
 from collections import namedtuple
 
-from pyrevit import revit, DB
 from pyrevit import forms
-from pyrevit import script
 from pyrevit import script
 from pyrevit.extensions import extensionmgr
 from pyrevit.extensions import components as ext_cmps
 
 
-__title__ = 'Create\nTheme'
+__title__ = 'Create Override\nExtension'
 
 
 # skip these bundle types
@@ -54,33 +52,34 @@ def create_theme_dir(theme_path, file_types, component):
 
 theme_directory = forms.pick_folder(title="Select Theme Path")
 
-selected_exts = forms.SelectFromList.show(
+if theme_directory:
+    selected_exts = forms.SelectFromList.show(
         extensionmgr.get_installed_ui_extensions(),
         multiselect=True,
         title="Select Extensions",
+    )
+
+    if selected_exts:
+        files_to_include = forms.SelectFromList.show(
+            [
+                BundleFileType('Python Scripts', '.py'),
+                BundleFileType('Icon Files', '.png'),
+                BundleFileType('WPF XAML Files', '.xaml'),
+                BundleFileType('Tooltip MP4 Files', '.mp4'),
+                BundleFileType('Tooltip SWF Files', '.swf'),
+                BundleFileType('Revit Models', '.rvt'),
+                BundleFileType('Photoshop Files', '.psd'),
+            ],
+            multiselect=True,
+            title="Select Bundle Files to Include",
         )
 
-files_to_include = forms.SelectFromList.show(
-        [
-            BundleFileType('Python Scripts', '.py'),
-            BundleFileType('Icon Files', '.png'),
-            BundleFileType('WPF XAML Files', '.xaml'),
-            BundleFileType('Tooltip MP4 Files', '.mp4'),
-            BundleFileType('Tooltip SWF Files', '.swf'),
-            BundleFileType('Revit Models', '.rvt'),
-            BundleFileType('Photoshop Files', '.psd'),
-        ],
-        multiselect=True,
-        title="Select Bundle Files to Include",
-        )
-
-if theme_directory and selected_exts:
-    for ext in selected_exts:
-        create_theme_dir(
-            theme_path=theme_directory,
-            file_types=[x.ext for x in files_to_include],
-            component=ext
-        )
+        for ext in selected_exts:
+            create_theme_dir(
+                theme_path=theme_directory,
+                file_types=[x.ext for x in files_to_include],
+                component=ext
+            )
 
 
 logger.reset_level()
